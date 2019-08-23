@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">鎖定螢幕</string>
+    <string name="permission">需要權限方能運行</string>
+    <string name="lockingMessage">這行字消失就是鎖定了</string>
+</resources>
