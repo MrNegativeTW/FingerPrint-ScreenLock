@@ -80,8 +80,4 @@ public class MainActivity extends AppCompatActivity {
             Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, OriginalScreenBrightness);
         }
     }
-
-
-
-
 }
