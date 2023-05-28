@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lock</string>
-    <string name="lockingMessage">Locked when this disappears.</string>
-    <string name="permission">Need permission to work.</string>
+
+    <string name="mainAct_message">Screen timeout set to minimum, locked when this text disappears</string>
+    <string name="mainAct_permissionDialog_title">Permission Request</string>
+    <string name="mainAct_permissionDialog_message">This app modifies device\'s screen timeout to lock the screen, therefore you can unlock using your fingerprint rather than a pattern or pin.</string>
+    <string name="mainAct_permissionDialog_positiveBtn">Go to settings</string>
+    <string name="mainAct_permissionDialog_negativeBtn">Exit</string>
 </resources>

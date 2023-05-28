@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">鎖定螢幕</string>
-    <string name="permission">需要權限方能運行</string>
-    <string name="lockingMessage">這行字消失就是鎖定了</string>
+
+    <string name="mainAct_message">螢幕逾時時間已設為最小\n這行字消失就是鎖定了</string>
+    <string name="mainAct_permissionDialog_title">授予權限</string>
+    <string name="mainAct_permissionDialog_message">本軟體利用修改裝置的螢幕逾時時間來達成鎖定螢幕，好處是下次解鎖時可使用指紋，而不是圖形或 Pin 碼</string>
+    <string name="mainAct_permissionDialog_positiveBtn">前往設定</string>
+    <string name="mainAct_permissionDialog_negativeBtn">離開</string>
 </resources>

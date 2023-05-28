@@ -32,48 +32,71 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        getOriginalSettings()
-        if (Settings.System.canWrite(this)) {
-            isPermissionGranted = false
+        if (isWriteSettingsPermissionGranted()) {
+            logI(TAG, "Write settings permission granted!")
+            binding.textViewLockMsg.visibility = View.VISIBLE
+            getOriginalSettings()
             lockScreen()
         } else {
-            Toast.makeText(this, R.string.permission, Toast.LENGTH_SHORT).show()
-            isPermissionGranted = true
-            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                    Uri.parse("package:$packageName"))
-            startActivityForResult(intent, 0)
+            showPermissionRequestDialog()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        restoreFromLockScreen()
+        if (isWriteSettingsPermissionGranted()) {
+            rollbackToOriginalSettings()
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        restoreFromLockScreen()
-        if (!isPermissionGranted) {
+        if (isWriteSettingsPermissionGranted()) {
+            rollbackToOriginalSettings()
+            finishAndRemoveTask()
             exitProcess(0)
         }
     }
 
     private fun hideSystemUI() {
         window.addFlags(16)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        window.decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
 
     private fun enterImmersiveMode() {
-        val windowInsetsController =
-                WindowCompat.getInsetsController(window, window.decorView)
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         // Configure the behavior of the hidden system bars.
-        windowInsetsController.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
         windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
         windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+    }
+
+    private fun isWriteSettingsPermissionGranted(): Boolean {
+        return Settings.System.canWrite(this)
+    }
+
+    private fun showPermissionRequestDialog() {
+        MaterialAlertDialogBuilder(this)
+                .setTitle(resources.getString(R.string.mainAct_permissionDialog_title))
+                .setMessage(resources.getString(R.string.mainAct_permissionDialog_message))
+                .setPositiveButton(resources.getString(R.string.mainAct_permissionDialog_positiveBtn)) { dialog, _ ->
+                    dialog.dismiss()
+                    startActivity(
+                            Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                                    Uri.parse("package:$packageName"))
+                    )
+                }
+                .setNegativeButton(resources.getString(R.string.mainAct_permissionDialog_negativeBtn)) { dialog, _ ->
+                    exitProcess(0)
+                }
+                .setCancelable(false)
+                .create()
+                .show()
     }
 
     private fun getOriginalSettings() {
