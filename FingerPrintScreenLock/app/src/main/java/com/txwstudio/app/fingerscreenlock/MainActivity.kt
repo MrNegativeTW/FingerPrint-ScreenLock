@@ -4,13 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.txwstudio.app.fingerscreenlock.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 
@@ -18,15 +17,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var originalScreenTimeout = 0
-    private var originalScreenBrightness = 0
-    private var isPermissionGranted = false
+    private var originalTimeout = 0
+    private var originalBrightness = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // hideSystemUI()
         enterImmersiveMode()
     }
 
@@ -58,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Decompiled from someone else's app, what does 16 mean? idk.
+     */
     private fun hideSystemUI() {
         window.addFlags(16)
         window.decorView.systemUiVisibility =
@@ -100,25 +100,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getOriginalSettings() {
-        originalScreenTimeout = Settings.System.getInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, 120000)
-        originalScreenBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 63)
-        Log.i("TEST", "OriginalScreenTimeout: $originalScreenTimeout")
-        Log.i("TEST", "OriginalScreenBrightness: $originalScreenBrightness")
+        originalTimeout = Settings.System.getInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, DEFAULT_TIMEOUT_2_MIN)
+        originalBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, DEFAULT_BRIGHTNESS_HALF)
+        logI(TAG, "Original timeout: $originalTimeout, brightness: $originalBrightness")
     }
 
     private fun lockScreen() {
-        Settings.System.putInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, 0)
-        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 10)
+        Settings.System.putInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, MINIMUM_TIMEOUT)
+        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, MINIMUM_BRIGHTNESS)
     }
 
-    private fun restoreFromLockScreen() {
-        if (!isPermissionGranted) {
-            Settings.System.putInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, originalScreenTimeout)
-            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, originalScreenBrightness)
-        }
+    private fun rollbackToOriginalSettings() {
+        Settings.System.putInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, originalTimeout)
+        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, originalBrightness)
     }
 
     companion object {
-        private const val TAG = "MainActivity2"
+        private const val TAG = "MainActivity"
+        private const val DEFAULT_TIMEOUT_2_MIN = 120000
+        private const val DEFAULT_BRIGHTNESS_HALF = 50
+        private const val MINIMUM_TIMEOUT = 0
+        private const val MINIMUM_BRIGHTNESS = 10
     }
 }
